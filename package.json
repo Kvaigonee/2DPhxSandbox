@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "webpack serve --mode development",
     "build": "npx webpack --config webpack.config.js"
   },
   "repository": {
@@ -11,10 +12,12 @@
     "url": "git+https://github.com/Kvaigonee/2DPhxSandbox.git"
   },
   "devDependencies": {
+    "html-webpack-plugin": "^5.5.0",
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.2",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1"
   },
   "author": "",
   "license": "ISC",
