@@ -1,8 +1,8 @@
 import { Interpolation } from "./examples/Interpolation";
-import { MatrixTranslation } from "./examples/MatrixTranslation";
+import { Translation } from "./examples/Translation";
 
 export {
     Interpolation,
-    MatrixTranslation
+    Translation
 }
 
