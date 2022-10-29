@@ -26,6 +26,13 @@ export class Buffer {
 
     /**
      *
+     */
+    public getBufferObject() : WebGLBuffer {
+        return this.buffer;
+    }
+
+    /**
+     *
      * @param data
      */
     public setData(data: BufferSource) {

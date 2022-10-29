@@ -1,7 +1,7 @@
-import {createProgram} from "./utils/ShaderProgram";
-import {getWebGLContext} from "./utils/Context";
-import {getShaderPair} from "./utils/ShaderPair";
+import ShaderProgram from "./utils/ShaderProgram";
+import ShaderPair from "./utils/ShaderPair";
 import {Buffer} from "./utils/Buffer";
+import Context from "./utils/Context";
 
 /**
  *
@@ -37,11 +37,13 @@ export function Interpolation() {
     }
     `;
 
-    let gl = getWebGLContext();
-    const { vertexShader, fragmentShader } = getShaderPair(gl, vertexShaderSource, fragmentShaderSource);
+    let gl = Context.createInstance().getWebGLContext();
+    const shaderPair = ShaderPair.createInstance(gl);
+    shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
 
-    let program = createProgram(gl, vertexShader, fragmentShader);
+    const { vertexShader, fragmentShader } = shaderPair.getShaderPair();
 
+    let program = ShaderProgram.createInstance(gl).updateProgram(vertexShader, fragmentShader);
     const buffer = new Buffer(gl);
 
     buffer.setData(new Float32Array([
@@ -78,6 +80,7 @@ export function Interpolation() {
 
     gl.useProgram(program);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+
 }
 
 const button = document.createElement("button");

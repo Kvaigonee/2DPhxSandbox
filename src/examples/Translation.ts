@@ -1,7 +1,7 @@
-import {CANVAS_HEIGHT, CANVAS_WIDTH, getWebGLContext} from "./utils/Context";
-import {createProgram} from "./utils/ShaderProgram";
+import Context, {CANVAS_HEIGHT, CANVAS_WIDTH} from "./utils/Context";
+import ShaderProgram from "./utils/ShaderProgram";
 import {Buffer} from "./utils/Buffer";
-import {getShaderPair} from "./utils/ShaderPair";
+import ShaderPair from "./utils/ShaderPair";
 
 export function Translation() {
     const fragmentShaderSource = `#version 300 es
@@ -30,10 +30,13 @@ export function Translation() {
     }
     `;
 
-    let gl = getWebGLContext();
-    const { vertexShader, fragmentShader } = getShaderPair(gl, vertexShaderSource, fragmentShaderSource);
+    let gl = Context.createInstance().getWebGLContext();
+    const shaderPair = ShaderPair.createInstance(gl);
+    shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
 
-    let program = createProgram(gl, vertexShader, fragmentShader);
+    const { vertexShader, fragmentShader } = shaderPair.getShaderPair();
+
+    let program = ShaderProgram.createInstance(gl).updateProgram(vertexShader, fragmentShader);
 
     const buffer = new Buffer(gl);
 
@@ -87,7 +90,7 @@ export function Translation() {
         draw([x, y]);
     };
 
-    inputY.oninput = (e) => {
+    inputY.oninput = () => {
         y = +inputY.value;
         draw([x, y]);
     };

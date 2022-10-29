@@ -4,19 +4,55 @@ const CANVAS_HEIGHT = 720;
 /**
  *
  */
-export function getWebGLContext() : WebGL2RenderingContext {
-    let canvas = document.querySelector("canvas");
-    canvas = canvas !== null ? canvas : document.createElement("canvas");
+export default class Context {
+    /**
+     *
+     * @private
+     */
+    private gl : WebGL2RenderingContext | null = null;
 
-    const gl = canvas.getContext("webgl2");
-    if (!gl) throw `Context is ${gl}`;
+    /**
+     *
+     * @private
+     */
+    private static instance : Context | null = null;
 
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
+    /**
+     *
+     * @private
+     */
+    private constructor() {
+    }
 
-    document.body.appendChild(canvas);
+    /**
+     *
+     */
+    public static createInstance() : Context {
+        if (this.instance === null) {
+            this.instance = new Context();
+        }
+        return this.instance
+    }
 
-    return gl;
+    /**
+     *
+     */
+    public getWebGLContext() : WebGL2RenderingContext {
+        if (this.gl !== null) return this.gl;
+
+        let canvas = document.querySelector("canvas");
+        canvas = canvas !== null ? canvas : document.createElement("canvas");
+
+        this.gl = canvas.getContext("webgl2");
+        if (!this.gl) throw `Context is ${this.gl}`;
+
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+
+        document.body.appendChild(canvas);
+
+        return this.gl;
+    }
 }
 
 /**

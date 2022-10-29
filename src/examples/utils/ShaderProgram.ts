@@ -1,21 +1,68 @@
 /**
  *
- * @param gl
- * @param vertexShader
- * @param fragmentShader
  */
-export function createProgram(gl: WebGL2RenderingContext,
-                       vertexShader: WebGLShader,
-                       fragmentShader: WebGLShader) : WebGLProgram {
-    let program = gl.createProgram();
-    if (program === null) throw new Error("Unable to create WebGL Program!");
+export default class ShaderProgram {
+    /**
+     *
+     * @private
+     */
+    private static instance : ShaderProgram | null = null;
 
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
+    /**
+     *
+     * @private
+     */
+    private gl : WebGL2RenderingContext;
 
-    if (gl.getProgramParameter(program, gl.LINK_STATUS)) return program;
+    /**
+     *
+     * @private
+     */
+    private program : WebGLProgram | null = null;
 
-    gl.deleteProgram(program);
-    throw new Error("Unable to create WebGL Program!");
+    /**
+     *
+     * @private
+     */
+    private constructor(context: WebGL2RenderingContext) {
+        this.gl = context;
+    }
+
+    /**
+     *
+     */
+    public static createInstance(gl: WebGL2RenderingContext) : ShaderProgram {
+        if (this.instance === null) {
+            this.instance = new ShaderProgram(gl);
+        }
+        return this.instance
+    }
+
+    /**
+     *
+     */
+    public updateProgram(vertexShader: WebGLShader,
+                         fragmentShader: WebGLShader) : WebGLProgram {
+        let program = this.gl.createProgram();
+        if (program === null) throw new Error("Unable to create WebGL Program!");
+
+        this.program = program;
+
+        this.gl.attachShader(this.program, vertexShader);
+        this.gl.attachShader(this.program, fragmentShader);
+        this.gl.linkProgram(this.program);
+
+        if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) return program;
+
+        throw new Error("Program error!");
+    }
+
+    /**
+     *
+     */
+    public removeProgram() {
+        this.gl.deleteProgram(this.program);
+        this.program = null;
+    }
 }
+
