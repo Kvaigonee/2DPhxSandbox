@@ -2,7 +2,13 @@ import Context, {CANVAS_HEIGHT, CANVAS_WIDTH} from "./utils/Context";
 import ShaderProgram from "./utils/ShaderProgram";
 import {Buffer} from "./utils/Buffer";
 import ShaderPair from "./utils/ShaderPair";
+import InputRange from "./utils/gui/InputRange";
 
+
+/**
+ * Пример перемещения вершин используя векторное преобразование
+ * @constructor
+ */
 export function Translation() {
     const fragmentShaderSource = `#version 300 es
 
@@ -38,6 +44,7 @@ export function Translation() {
 
     let program = ShaderProgram.createInstance(gl).updateProgram(vertexShader, fragmentShader);
 
+    //Единажды устанавливаем данные в буффер, далее они будут изменяться только внутри шейдерной программы
     const buffer = new Buffer(gl);
 
     buffer.setData(new Float32Array([
@@ -61,6 +68,8 @@ export function Translation() {
     gl.clearColor(0, 0, 0, 0);
     gl.useProgram(program);
 
+    //Надо учесть, что при каждом вызове отрисовки мы вновь начинаем работу с заранее
+    //установленными данными, т.е. вершины будут в исходных координатах
     const draw = (translation: [number, number]) => {
         gl.clear(gl.COLOR_BUFFER_BIT);
         gl.uniform2fv(translationLocation, normalize(translation));
@@ -68,30 +77,18 @@ export function Translation() {
         gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
-    const inputX = document.createElement("input");
-    const inputY = document.createElement("input");
+    const inputX = new InputRange();
+    const inputY = new InputRange();
+
     let x = 0, y = 0;
 
-    inputX.type = "range";
-    inputX.min = "-200";
-    inputX.max = "200";
-    inputX.value = x.toString();
-
-    inputY.type = "range";
-    inputY.min = "-200";
-    inputY.max = "200";
-    inputY.value = y.toString();
-
-    document.body.appendChild(inputX);
-    document.body.appendChild(inputY);
-
-    inputX.oninput = () => {
-        x = +inputX.value
+    inputX.getElement().oninput = () => {
+        x = +inputX.getElement().value;
         draw([x, y]);
     };
 
-    inputY.oninput = () => {
-        y = +inputY.value;
+    inputY.getElement().oninput = () => {
+        y = +inputY.getElement().value;
         draw([x, y]);
     };
 

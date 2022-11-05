@@ -1,5 +1,7 @@
-
-
+/**
+ * Генерация массива простых чисел в пределах диапозона значений
+ * @param range
+ */
 function getPrimeFactorArray(range: number) : Array<number> {
     let result : number[] = [];
     for (let k = 2; k < range; k++) {
