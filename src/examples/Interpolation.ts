@@ -1,7 +1,7 @@
 import ShaderProgram from "./utils/ShaderProgram";
 import ShaderPair from "./utils/ShaderPair";
 import {Buffer} from "./utils/Buffer";
-import Context from "./utils/Context";
+import Context from "./utils/GLContext";
 
 /**
  *
@@ -37,7 +37,18 @@ export function Interpolation() {
     }
     `;
 
-    let gl = Context.createInstance().getWebGLContext();
+    const canvas = document.createElement("canvas");
+
+    canvas.width = 1280;
+    canvas.height = 720;
+
+    document.body.appendChild(canvas);
+
+    const webGLContext = new Context(canvas);
+
+    let gl = webGLContext.getContextProtected();
+
+
     const shaderPair = ShaderPair.createInstance(gl);
     shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
 

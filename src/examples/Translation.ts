@@ -1,8 +1,8 @@
-import Context, {CANVAS_HEIGHT, CANVAS_WIDTH} from "./utils/Context";
 import ShaderProgram from "./utils/ShaderProgram";
 import {Buffer} from "./utils/Buffer";
 import ShaderPair from "./utils/ShaderPair";
 import InputRange from "./utils/gui/InputRange";
+import GLContext from "./utils/GLContext";
 
 
 /**
@@ -36,7 +36,17 @@ export function Translation() {
     }
     `;
 
-    let gl = Context.createInstance().getWebGLContext();
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = 1280;
+    canvas.height = 720;
+
+    document.body.appendChild(canvas);
+
+    const glContext = new GLContext(canvas);
+    const gl = glContext.getContextProtected();
+
     const shaderPair = ShaderPair.createInstance(gl);
     shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
 
@@ -107,6 +117,6 @@ document.body.appendChild(button);
  * @param vertex
  */
 function normalize(vertex: [number, number]) {
-    return [vertex[0] * (2 / CANVAS_WIDTH), vertex[1] * (2 / CANVAS_HEIGHT)]
+    return [vertex[0] * (2 / 1280), vertex[1] * (2 / 720)]
 }
 
