@@ -1,7 +1,7 @@
 /**
  *
  */
-export class Buffer {
+export class GLBuffer {
     /**
      *
      */
@@ -18,7 +18,7 @@ export class Buffer {
      */
     public constructor(gl : WebGL2RenderingContext) {
         let buffer = gl.createBuffer();
-        if(buffer === null) throw new Error("Buffer was not created!");
+        if(buffer === null) throw new Error("GLBuffer was not created!");
 
         this.gl = gl;
         this.buffer = buffer;

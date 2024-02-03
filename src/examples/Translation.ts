@@ -1,17 +1,11 @@
-import ShaderProgram from "./utils/ShaderProgram";
-import {Buffer} from "./utils/Buffer";
-import ShaderPair from "./utils/ShaderPair";
-import InputRange from "./utils/gui/InputRange";
-import GLContext from "./utils/GLContext";
+import ShaderProgram from "../ShaderProgram";
+import {GLBuffer} from "../GLBuffer";
+import ShaderPair from "../ShaderPair";
+import GLContext from "../gl/GLContext";
+import AbstractExample from "./AbstractExample";
 
 
-/**
- * Пример перемещения вершин используя векторное преобразование
- * @constructor
- */
-export function Translation() {
-    const fragmentShaderSource = `#version 300 es
-
+const fragmentShaderSource = `#version 300 es
     #ifdef GL_FRAGMENT_PRECISION_HIGH
     precision highp float;
     #else
@@ -25,7 +19,7 @@ export function Translation() {
     }
     `;
 
-    const vertexShaderSource = `#version 300 es
+const vertexShaderSource = `#version 300 es
     
     in vec2 a_position;
     uniform vec2 u_translation;
@@ -37,80 +31,88 @@ export function Translation() {
     `;
 
 
-    const canvas = document.createElement("canvas");
 
-    canvas.width = 1280;
-    canvas.height = 720;
+/**
+ * Пример перемещения вершин используя векторное преобразование
+ * @constructor
+ */
+export class Translation extends AbstractExample {
 
-    document.body.appendChild(canvas);
+    public constructor() {
+        super();
 
-    const glContext = new GLContext(canvas);
-    const gl = glContext.getContextProtected();
-
-    const shaderPair = ShaderPair.createInstance(gl);
-    shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
-
-    const { vertexShader, fragmentShader } = shaderPair.getShaderPair();
-
-    let program = ShaderProgram.createInstance(gl).updateProgram(vertexShader, fragmentShader);
-
-    //Единажды устанавливаем данные в буффер, далее они будут изменяться только внутри шейдерной программы
-    const buffer = new Buffer(gl);
-
-    buffer.setData(new Float32Array([
-        -0.5, -0.5,
-        -0.5, 0.5,
-        0.7, -0.5
-    ]));
-
-    buffer.setShaderAttribute(program, {
-        name: "a_position",
-        size : 2,
-        type : gl.FLOAT,
-        normalize : false,
-        stride : 0,
-        offset : 0
-    });
-
-    let translationLocation = gl.getUniformLocation(program, "u_translation");
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0, 0, 0, 0);
-    gl.useProgram(program);
-
-    //Надо учесть, что при каждом вызове отрисовки мы вновь начинаем работу с заранее
-    //установленными данными, т.е. вершины будут в исходных координатах
-    const draw = (translation: [number, number]) => {
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.uniform2fv(translationLocation, normalize(translation));
-
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        this.init();
     }
 
-    const inputX = new InputRange();
-    const inputY = new InputRange();
+    public destroy() {
+        document.body.removeChild(this.canvasElement);
+    }
 
-    let x = 0, y = 0;
+    private init() {
+        const glContext = new GLContext(this.canvasElement);
+        const gl = glContext.getContextProtected();
 
-    inputX.getElement().oninput = () => {
-        x = +inputX.getElement().value;
+        const shaderPair = ShaderPair.createInstance(gl);
+        shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
+
+        const { vertexShader, fragmentShader } = shaderPair.getShaderPair();
+
+        let program = ShaderProgram.createInstance(gl).updateProgram(vertexShader, fragmentShader);
+
+        //Единажды устанавливаем данные в буффер, далее они будут изменяться только внутри шейдерной программы
+        const buffer = new GLBuffer(gl);
+
+        buffer.setData(new Float32Array([
+            -0.5, -0.5,
+            -0.5, 0.5,
+            0.7, -0.5
+        ]));
+
+        buffer.setShaderAttribute(program, {
+            name: "a_position",
+            size: 2,
+            type: gl.FLOAT,
+            normalize: false,
+            stride: 0,
+            offset: 0
+        });
+
+        let translationLocation = gl.getUniformLocation(program, "u_translation");
+
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.clearColor(0, 0, 0, 0);
+        gl.useProgram(program);
+
+        //Надо учесть, что при каждом вызове отрисовки мы вновь начинаем работу с заранее
+        //установленными данными, т.е. вершины будут в исходных координатах
+        const draw = (translation: [number, number]) => {
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.uniform2fv(translationLocation, normalize(translation));
+
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+        }
+
+        const inputX = document.createElement("input");
+        const inputY = document.createElement("input");
+
+        inputX.type = "range";
+        inputY.type = "range"
+
+        let x = 0, y = 0;
+
+        inputX.oninput = () => {
+            x = +inputX.value;
+            draw([x, y]);
+        };
+
+        inputY.oninput = () => {
+            y = +inputY.value;
+            draw([x, y]);
+        };
+
         draw([x, y]);
-    };
-
-    inputY.getElement().oninput = () => {
-        y = +inputY.getElement().value;
-        draw([x, y]);
-    };
-
-    draw([x, y]);
+    }
 }
-
-const button = document.createElement("button");
-button.addEventListener("click", Translation);
-button.innerText = "Translation example";
-
-document.body.appendChild(button);
-
 
 /**
  * Нормализуем координаты

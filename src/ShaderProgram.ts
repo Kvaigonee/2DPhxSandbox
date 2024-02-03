@@ -1,3 +1,5 @@
+import GLShader from "./gl/GLShader";
+
 /**
  *
  */
@@ -24,7 +26,13 @@ export default class ShaderProgram {
      *
      * @private
      */
-    private constructor(context: WebGL2RenderingContext) {
+    private vertexShader : GLShader | null;
+
+    /**
+     *
+     * @private
+     */
+    private constructor(context: WebGL2RenderingContext, vertexShader : GLShader, fragmentShader : GLShader) {
         this.gl = context;
     }
 

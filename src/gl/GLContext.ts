@@ -1,4 +1,4 @@
-import EventEmitter, {AbstractEventMap} from "./EventEmmiter";
+import EventEmitter, {AbstractEventMap} from "../EventEmmiter";
 
 /**
  *
@@ -14,7 +14,7 @@ export default class GLContext extends EventEmitter<GLContextEventMap>{
      *
      * @private
      */
-    private canvas : HTMLCanvasElement;
+    private canvas : HTMLCanvasElement | null;
 
     /**
      *
@@ -32,6 +32,12 @@ export default class GLContext extends EventEmitter<GLContextEventMap>{
      *
      * @private
      */
+    private destroyed = false;
+
+    /**
+     *
+     * @private
+     */
     public constructor(canvas : HTMLCanvasElement,
                        webGLContextAttributes ?: WebGLContextAttributes) {
         super();
@@ -44,9 +50,35 @@ export default class GLContext extends EventEmitter<GLContextEventMap>{
     /**
      *
      */
-    public getContext() { return this.gl; }
-    public getCanvas() { return this.canvas; }
-    public getWebGLContextAttributes() { return this.webGLContextAttributes; }
+    public destroy() {
+        this.canvas = null;
+        this.gl = null;
+        this.destroyed = true;
+
+        this.removeAllEventListeners("valid");
+        this.removeAllEventListeners("invalid");
+    }
+
+    /**
+     *
+     */
+    public getContext() {
+        return this.gl;
+    }
+
+    /**
+     *
+     */
+    public getCanvas() {
+        return this.canvas;
+    }
+
+    /**
+     *
+     */
+    public getWebGLContextAttributes() {
+        return this.webGLContextAttributes;
+    }
 
     /**
      *
@@ -91,6 +123,12 @@ export default class GLContext extends EventEmitter<GLContextEventMap>{
      */
     public validate() {
         if (this.valid) return;
+
+        if (this.canvas === null) {
+            this.valid = false;
+            this.emitEvent("invalid", {});
+            return;
+        }
 
         this.gl = this.canvas.getContext("webgl2", this.webGLContextAttributes);
 

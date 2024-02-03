@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild ./src/index.ts --bundle --outdir=bundle",
-    "rebuild": "esbuild ./src/index.ts --bundle --outdir=bundle --watch"
+    "build": "esbuild src/examples/index.ts --bundle --outdir=bundle",
+    "rebuild": "esbuild ./src/examples/index.ts --bundle --outdir=bundle --watch"
   },
   "repository": {
     "type": "git",
