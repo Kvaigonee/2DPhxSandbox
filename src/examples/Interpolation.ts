@@ -1,8 +1,8 @@
-import ShaderProgram from "../ShaderProgram";
-import ShaderPair from "../ShaderPair";
+import GLShaderProgram from "../gl/GLShaderProgram";
 import {GLBuffer} from "../GLBuffer";
 import Context from "../gl/GLContext";
 import AbstractExample from "./AbstractExample";
+import GLShader, {GLShaderTypes} from "../gl/GLShader";
 
 const fragmentShaderSource = `#version 300 es
 
@@ -53,12 +53,11 @@ export class Interpolation extends AbstractExample {
 
         let gl = webGLContext.getContextProtected();
 
-        const shaderPair = ShaderPair.createInstance(gl);
-        shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
+        const vertexShader = new GLShader(gl, vertexShaderSource, GLShaderTypes.VERTEX);
+        const fragmentShader = new GLShader(gl, fragmentShaderSource, GLShaderTypes.FRAGMENT);
 
-        const { vertexShader, fragmentShader } = shaderPair.getShaderPair();
+        const glProgram = new GLShaderProgram(gl, vertexShader, fragmentShader);
 
-        const program = ShaderProgram.createInstance(gl).updateProgram(vertexShader, fragmentShader);
         const buffer = new GLBuffer(gl);
 
         buffer.setData(new Float32Array([
@@ -69,6 +68,12 @@ export class Interpolation extends AbstractExample {
             0.7, -0.5,
             0, 0, 1
         ]));
+
+        const program = glProgram.getProgram();
+
+        if (!program) {
+            throw new Error("Program is null!");
+        }
 
         buffer.setShaderAttribute(program, {
             name: "a_position",

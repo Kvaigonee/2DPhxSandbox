@@ -1,5 +1,5 @@
-import EventEmitter from "../EventEmmiter";
-import IGLObjectEventMap from "../IGLObjectEventMap";
+import EventEmitter from "../utils/EventEmmiter";
+import IValidatedEventMap from "../IValidatedEventMap";
 
 /**
  *
@@ -7,7 +7,7 @@ import IGLObjectEventMap from "../IGLObjectEventMap";
  * @param type
  * @param source
  */
-export default class GLShader extends EventEmitter<IGLObjectEventMap>{
+export default class GLShader extends EventEmitter<IValidatedEventMap>{
     /**
      *
      * @private
@@ -59,7 +59,10 @@ export default class GLShader extends EventEmitter<IGLObjectEventMap>{
     /**
      *
      */
-    getGlShader() {
+    getGlShader() : WebGLShader {
+        if (this.glShader === null) {
+            throw new Error("Web gl shader is null!")
+        }
         return this.glShader;
     }
 
@@ -117,8 +120,6 @@ export default class GLShader extends EventEmitter<IGLObjectEventMap>{
 
         this.emitEvent("invalid", {});
     }
-
-
 }
 
 

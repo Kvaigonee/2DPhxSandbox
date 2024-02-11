@@ -1,9 +1,10 @@
-import EventEmitter, {AbstractEventMap} from "../EventEmmiter";
+import EventEmitter, {AbstractEventMap} from "../utils/EventEmmiter";
+import IValidatedEventMap from "../IValidatedEventMap";
 
 /**
  *
  */
-export default class GLContext extends EventEmitter<GLContextEventMap>{
+export default class GLContext extends EventEmitter<IValidatedEventMap>{
     /**
      *
      * @private
@@ -141,16 +142,4 @@ export default class GLContext extends EventEmitter<GLContextEventMap>{
         this.emitEvent("valid", {});
         this.valid = true;
     }
-}
-
-
-interface GLContextEventMap extends AbstractEventMap {
-
-    valid: {};
-
-    invalid: {};
-}
-
-export {
-    GLContextEventMap
 }

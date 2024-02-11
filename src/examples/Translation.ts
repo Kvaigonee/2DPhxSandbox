@@ -1,8 +1,8 @@
-import ShaderProgram from "../ShaderProgram";
+import GLShaderProgram from "../gl/GLShaderProgram";
 import {GLBuffer} from "../GLBuffer";
-import ShaderPair from "../ShaderPair";
 import GLContext from "../gl/GLContext";
 import AbstractExample from "./AbstractExample";
+import GLShader, {GLShaderTypes} from "../gl/GLShader";
 
 
 const fragmentShaderSource = `#version 300 es
@@ -17,7 +17,7 @@ const fragmentShaderSource = `#version 300 es
     void main() {
       outColor = vec4(1, 0, 0, 1);
     }
-    `;
+`;
 
 const vertexShaderSource = `#version 300 es
     
@@ -28,8 +28,7 @@ const vertexShaderSource = `#version 300 es
         vec2 move = a_position + u_translation;
         gl_Position = vec4(move, 1, 1);
     }
-    `;
-
+`;
 
 
 /**
@@ -37,6 +36,9 @@ const vertexShaderSource = `#version 300 es
  * @constructor
  */
 export class Translation extends AbstractExample {
+
+    private inputX = document.createElement("input");
+    private inputY = document.createElement("input");
 
     public constructor() {
         super();
@@ -46,18 +48,23 @@ export class Translation extends AbstractExample {
 
     public destroy() {
         document.body.removeChild(this.canvasElement);
+        document.body.removeChild(this.inputX);
+        document.body.removeChild(this.inputY);
     }
 
     private init() {
         const glContext = new GLContext(this.canvasElement);
         const gl = glContext.getContextProtected();
 
-        const shaderPair = ShaderPair.createInstance(gl);
-        shaderPair.setShaderPair(vertexShaderSource, fragmentShaderSource)
+        const vertexShader = new GLShader(gl, vertexShaderSource, GLShaderTypes.VERTEX);
+        const fragmentShader = new GLShader(gl, fragmentShaderSource, GLShaderTypes.FRAGMENT);
 
-        const { vertexShader, fragmentShader } = shaderPair.getShaderPair();
+        const glProgram = new GLShaderProgram(gl, vertexShader, fragmentShader);
+        const program = glProgram.getProgram();
 
-        let program = ShaderProgram.createInstance(gl).updateProgram(vertexShader, fragmentShader);
+        if (!program) {
+            throw new Error("Program is null!");
+        }
 
         //Единажды устанавливаем данные в буффер, далее они будут изменяться только внутри шейдерной программы
         const buffer = new GLBuffer(gl);
@@ -92,21 +99,21 @@ export class Translation extends AbstractExample {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
         }
 
-        const inputX = document.createElement("input");
-        const inputY = document.createElement("input");
+        document.body.appendChild(this.inputX);
+        document.body.appendChild(this.inputY);
 
-        inputX.type = "range";
-        inputY.type = "range"
+        this.inputX.type = "range";
+        this.inputY.type = "range"
 
         let x = 0, y = 0;
 
-        inputX.oninput = () => {
-            x = +inputX.value;
+        this.inputX.oninput = () => {
+            x = +this.inputX.value;
             draw([x, y]);
         };
 
-        inputY.oninput = () => {
-            y = +inputY.value;
+        this.inputY.oninput = () => {
+            y = +this.inputY.value;
             draw([x, y]);
         };
 
