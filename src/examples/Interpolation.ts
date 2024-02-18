@@ -1,5 +1,5 @@
 import GLShaderProgram from "../gl/GLShaderProgram";
-import {GLBuffer} from "../GLBuffer";
+import {GLBuffer} from "../gl/GLBuffer";
 import Context from "../gl/GLContext";
 import AbstractExample from "./AbstractExample";
 import GLShader, {GLShaderTypes} from "../gl/GLShader";
@@ -58,7 +58,7 @@ export class Interpolation extends AbstractExample {
 
         const glProgram = new GLShaderProgram(gl, vertexShader, fragmentShader);
 
-        const buffer = new GLBuffer(gl);
+        const buffer = new GLBuffer(webGLContext);
 
         buffer.setData(new Float32Array([
             -0.5, -0.5,

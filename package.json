@@ -11,6 +11,9 @@
     "type": "git",
     "url": "git+https://github.com/Kvaigonee/2DPhxSandbox.git"
   },
+  "dependencies": {
+    "gl-matrix": "^3.4.3"
+  },
   "devDependencies": {
     "esbuild": "^0.19.10",
     "typescript": "^5.3.3"

@@ -7,7 +7,7 @@ import IValidatedEventMap from "../IValidatedEventMap";
  * @param type
  * @param source
  */
-export default class GLShader extends EventEmitter<IValidatedEventMap>{
+export default class GLShader extends EventEmitter<IValidatedEventMap> {
     /**
      *
      * @private

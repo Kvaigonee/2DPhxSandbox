@@ -1,5 +1,5 @@
 import GLShaderProgram from "../gl/GLShaderProgram";
-import {GLBuffer} from "../GLBuffer";
+import {GLBuffer} from "../gl/GLBuffer";
 import GLContext from "../gl/GLContext";
 import AbstractExample from "./AbstractExample";
 import GLShader, {GLShaderTypes} from "../gl/GLShader";
@@ -67,7 +67,7 @@ export class Translation extends AbstractExample {
         }
 
         //Единажды устанавливаем данные в буффер, далее они будут изменяться только внутри шейдерной программы
-        const buffer = new GLBuffer(gl);
+        const buffer = new GLBuffer(glContext);
 
         buffer.setData(new Float32Array([
             -0.5, -0.5,
