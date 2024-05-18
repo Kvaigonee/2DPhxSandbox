@@ -54,12 +54,12 @@ export class Translation extends AbstractExample {
 
     private init() {
         const glContext = new GLContext(this.canvasElement);
-        const gl = glContext.getContextProtected();
+        const gl = glContext.getContext();
 
-        const vertexShader = new GLShader(gl, vertexShaderSource, GLShaderTypes.VERTEX);
-        const fragmentShader = new GLShader(gl, fragmentShaderSource, GLShaderTypes.FRAGMENT);
+        const vertexShader = new GLShader(glContext, vertexShaderSource, GLShaderTypes.VERTEX);
+        const fragmentShader = new GLShader(glContext, fragmentShaderSource, GLShaderTypes.FRAGMENT);
 
-        const glProgram = new GLShaderProgram(gl, vertexShader, fragmentShader);
+        const glProgram = new GLShaderProgram(glContext, vertexShader, fragmentShader);
         const program = glProgram.getProgram();
 
         if (!program) {

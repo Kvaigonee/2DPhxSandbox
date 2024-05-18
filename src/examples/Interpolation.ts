@@ -51,12 +51,12 @@ export class Interpolation extends AbstractExample {
     private init() {
         const webGLContext = new Context(this.canvasElement);
 
-        let gl = webGLContext.getContextProtected();
+        let gl = webGLContext.getContext();
 
-        const vertexShader = new GLShader(gl, vertexShaderSource, GLShaderTypes.VERTEX);
-        const fragmentShader = new GLShader(gl, fragmentShaderSource, GLShaderTypes.FRAGMENT);
+        const vertexShader = new GLShader(webGLContext, vertexShaderSource, GLShaderTypes.VERTEX);
+        const fragmentShader = new GLShader(webGLContext, fragmentShaderSource, GLShaderTypes.FRAGMENT);
 
-        const glProgram = new GLShaderProgram(gl, vertexShader, fragmentShader);
+        const glProgram = new GLShaderProgram(webGLContext, vertexShader, fragmentShader);
 
         const buffer = new GLBuffer(webGLContext);
 

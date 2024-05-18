@@ -1,61 +1,46 @@
 import GLShader from "./GLShader";
-import EventEmitter from "../utils/EventEmmiter";
-import IValidatedEventMap from "../IValidatedEventMap";
+import GLContext from "./GLContext";
 
 /**
  *
  */
-export default class GLShaderProgram extends EventEmitter<IValidatedEventMap>{
+export default class GLShaderProgram {
     /**
      *
      * @private
      */
-    private gl : WebGL2RenderingContext;
+    private gl : GLContext;
 
     /**
      *
      * @private
      */
-    private program : WebGLProgram | null = null;
+    private readonly program : WebGLProgram;
 
     /**
      *
      * @private
      */
-    private vertexShader : GLShader;
+    private readonly vertexShader : GLShader;
 
     /**
      *
      * @private
      */
-    private fragmentShader : GLShader;
+    private readonly fragmentShader : GLShader;
 
     /**
      *
      * @private
      */
-    private valid = false;
-
-    /**
-     *
-     * @private
-     */
-    public constructor(context: WebGL2RenderingContext,
-                        vertexShader : GLShader,
-                        fragmentShader : GLShader) {
-        super();
-
+    public constructor(context: GLContext,
+                       vertexShader : GLShader,
+                       fragmentShader : GLShader) {
         this.gl = context;
         this.vertexShader = vertexShader;
         this.fragmentShader = fragmentShader;
-
-        this.validate();
-    }
-
-    /**
-     *
-     */
-    public destroy() {
+        this.program = this.createProgram();
+        this.linkProgram();
     }
 
     /**
@@ -79,57 +64,35 @@ export default class GLShaderProgram extends EventEmitter<IValidatedEventMap>{
         return this.fragmentShader;
     }
 
-    /**
-     *
-     * @param shader
-     */
-    public setVertexShader(shader : GLShader) {
-        this.vertexShader = shader;
-        this.valid = false;
-        this.validate();
-    }
 
     /**
      *
-     * @param shader
+     * @private
      */
-    public setFragmentShader(shader : GLShader) {
-        this.fragmentShader = shader;
-        this.valid = false;
-        this.validate();
+    private createProgram() {
+        const program = this.gl.getContext().createProgram();
+        if (program === null)  {
+            throw new Error("Create WebGLProgram error!");
+        }
+
+        return program;
     }
 
     /**
      *
      * @private
      */
-    private validate() {
-        if (this.valid) return;
+    private linkProgram() {
+        const program = this.program;
+        const gl = this.gl.getContext();
 
-        const program = this.gl.createProgram();
-        if (program === null)  {
-            this.valid = false;
-            console.warn("Unable to create WebGL Program!");
-            this.emitEvent("invalid", {});
-            return;
+        gl.attachShader(program, this.vertexShader.getGlShader());
+        gl.attachShader(program, this.fragmentShader.getGlShader());
+        gl.linkProgram(program);
+
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            throw new Error("Link WebGLProgram error!");
         }
-
-        this.program = program;
-
-        this.gl.attachShader(this.program, this.vertexShader.getGlShader());
-        this.gl.attachShader(this.program, this.fragmentShader.getGlShader());
-        this.gl.linkProgram(this.program);
-
-        if (this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
-            this.valid = true;
-            this.emitEvent("valid", {});
-
-            return;
-        }
-
-        this.valid = false;
-        console.warn("Program error!");
     }
-
 }
 

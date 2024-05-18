@@ -1,5 +1,4 @@
-import EventEmitter from "../utils/EventEmmiter";
-import IValidatedEventMap from "../IValidatedEventMap";
+import GLContext from "./GLContext";
 
 /**
  *
@@ -7,7 +6,7 @@ import IValidatedEventMap from "../IValidatedEventMap";
  * @param type
  * @param source
  */
-export default class GLShader extends EventEmitter<IValidatedEventMap> {
+export default class GLShader {
     /**
      *
      * @private
@@ -18,26 +17,20 @@ export default class GLShader extends EventEmitter<IValidatedEventMap> {
      *
      * @private
      */
-    private gl : WebGL2RenderingContext;
+    private gl : GLContext;
 
 
     /**
      *
      * @private
      */
-    private source : string;
+    private readonly source : string;
 
     /**
      *
      * @private
      */
-    private glShader : WebGLShader | null = null;
-
-    /**
-     *
-     * @private
-     */
-    private valid : boolean = false;
+    private readonly glShader : WebGLShader;
 
     /**
      *
@@ -45,24 +38,21 @@ export default class GLShader extends EventEmitter<IValidatedEventMap> {
      * @param source
      * @param type
      */
-    public constructor(context : WebGL2RenderingContext,
+    public constructor(context : GLContext,
                        source : string,
                        type : GLShaderTypes) {
-        super();
         this.gl = context;
         this.type = type;
         this.source = source;
 
-        this.validate();
+        this.glShader = this.createShader();
+        this.compileShader();
     }
 
     /**
      *
      */
     getGlShader() : WebGLShader {
-        if (this.glShader === null) {
-            throw new Error("Web gl shader is null!")
-        }
         return this.glShader;
     }
 
@@ -75,50 +65,31 @@ export default class GLShader extends EventEmitter<IValidatedEventMap> {
 
     /**
      *
-     * @param source
-     */
-    setSource(source : string) {
-        if (source === this.source) return;
-
-        this.source = source;
-        this.valid = false;
-
-        this.validate();
-    }
-
-    /**
-     *
      * @private
      */
-    private validate() {
-        if (this.valid) return;
-
-        const gl = this.gl;
+    private createShader() {
+        const gl = this.gl.getContext();
         const type = this.type;
         const shader = gl.createShader(type);
 
         if (!shader) {
-            console.warn("Unable to create shader with type " + type);
-            this.valid = false;
-            this.emitEvent("invalid", {});
-            return;
+            throw new Error("Creating WebGLShader error, shader type: " + type);
         }
+
+        return shader;
+    }
+
+    private compileShader() {
+        const gl = this.gl.getContext();
+        const shader = this.glShader;
 
         gl.shaderSource(shader, this.source);
         gl.compileShader(shader);
 
-        if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            this.valid = true;
-            this.glShader = shader;
-
-            this.emitEvent("valid", {});
-            return;
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            gl.deleteShader(shader);
+            throw new Error("Compile WebGLShader error, shader type: " + this.type);
         }
-
-        gl.deleteShader(shader);
-        console.warn("Unable to create shader with type " + type);
-
-        this.emitEvent("invalid", {});
     }
 }
 

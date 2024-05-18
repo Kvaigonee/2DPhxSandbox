@@ -1,11 +1,9 @@
-import EventEmitter from "../utils/EventEmmiter";
-import IValidatedEventMap from "../IValidatedEventMap";
 import GLContext from "./GLContext";
 
 /**
  *
  */
-export class GLBuffer extends EventEmitter<IValidatedEventMap> {
+export class GLBuffer {
     /**
      *
      */
@@ -14,36 +12,21 @@ export class GLBuffer extends EventEmitter<IValidatedEventMap> {
     /**
      *
      */
-    private buffer : WebGLBuffer | null = null;
-
-    /**
-     *
-     */
-    private valid = false;
+    private readonly buffer : WebGLBuffer;
 
     /**
      *
      * @param context
      */
     public constructor(context : GLContext) {
-        super();
-
         this.context = context;
-        this.validate();
-    }
-
-    public isValid() {
-        return this.valid;
+        this.buffer = this.createBuffer();
     }
 
     /**
      *
      */
     public getBufferObject() : WebGLBuffer {
-        if (this.buffer === null) {
-            throw new Error("Buffer is null");
-        }
-
         return this.buffer;
     }
 
@@ -52,7 +35,7 @@ export class GLBuffer extends EventEmitter<IValidatedEventMap> {
      * @param data
      */
     public setData(data: BufferSource) {
-        const gl = this.context.getContextProtected();
+        const gl = this.context.getContext();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
@@ -62,35 +45,26 @@ export class GLBuffer extends EventEmitter<IValidatedEventMap> {
      *
      */
     public setShaderAttribute(program: WebGLProgram, description: ShaderAttributeDescription) {
-        if (this.buffer === null) {
-            throw new Error("Buffer is null!");
-        }
-
         const { name, size, type, normalize, stride, offset } = description;
-
-        const gl = this.context.getContextProtected();
+        const gl = this.context.getContext();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
 
         let attribPosition = gl.getAttribLocation(program, name);
-        gl.enableVertexAttribArray(attribPosition);
 
-        gl.vertexAttribPointer(
-            attribPosition, size, type, normalize, stride, offset);
+        gl.enableVertexAttribArray(attribPosition);
+        gl.vertexAttribPointer(attribPosition, size, type, normalize, stride, offset);
     }
 
     /**
      *
      * @private
      */
-    private validate() {
-        if (this.valid) return;
+    private createBuffer() {
+        const buffer = this.context.getContext().createBuffer();
+        if (!buffer) throw new Error("WebGLBuffer creating error!");
 
-        let buffer = this.context.getContextProtected().createBuffer();
-        if (buffer === null) throw new Error("GLBuffer was not created!");
-
-        this.buffer = buffer;
-        this.valid = true;
+        return buffer;
     }
 }
 
