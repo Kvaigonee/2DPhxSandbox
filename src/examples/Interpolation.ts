@@ -57,7 +57,6 @@ export class Interpolation extends AbstractExample {
         const fragmentShader = new GLShader(webGLContext, fragmentShaderSource, GLShaderTypes.FRAGMENT);
 
         const glProgram = new GLShaderProgram(webGLContext, vertexShader, fragmentShader);
-
         const buffer = new GLBuffer(webGLContext);
 
         buffer.setData(new Float32Array([

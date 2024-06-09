@@ -2,12 +2,14 @@ import { Interpolation } from "./Interpolation";
 import { Translation } from "./Translation";
 import AbstractExample from "./AbstractExample";
 import { RotationTriangle } from "./RotationTriangle";
+import CubeExample from "./Cube";
 
 
 const examples : Examples = {
     Interpolation,
     Translation,
-    RotationTriangle
+    RotationTriangle,
+    CubeExample
 }
 
 

@@ -105,7 +105,6 @@ export class RotationTriangle extends AbstractExample {
         gl.clearColor(0, 0, 0, 0);
         gl.useProgram(program);
 
-
         let perspectiveMatrix = mat4.perspectiveNO(
             mat4.create(),
             Math.PI / 4,
@@ -116,14 +115,12 @@ export class RotationTriangle extends AbstractExample {
 
         perspectiveMatrix = mat4.translate(mat4.create(), perspectiveMatrix, [0, 0, -10]);
 
-        const draw = (rotationX ?: number) => {
+        const draw = (rotationX : number) => {
             let matrix = perspectiveMatrix;
 
-            if (rotationX !== undefined) {
-                matrix = mat4.rotateZ(mat4.create(), matrix, rotationX);
-                matrix = mat4.rotateY(mat4.create(), matrix, rotationX);
-                matrix = mat4.rotateX(mat4.create(), matrix, rotationX);
-            }
+            matrix = mat4.rotateZ(mat4.create(), matrix, rotationX);
+            matrix = mat4.rotateY(mat4.create(), matrix, rotationX);
+            matrix = mat4.rotateX(mat4.create(), matrix, rotationX);
 
             gl.clear(gl.COLOR_BUFFER_BIT);
             gl.uniformMatrix4fv(matrixLocation, false, matrix);
