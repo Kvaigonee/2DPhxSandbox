@@ -39,13 +39,13 @@ const vertexShaderSource = `#version 300 es
  */
 export class Interpolation extends AbstractExample {
 
-    constructor() {
-        super();
+    constructor(rootElement: HTMLElement) {
+        super(rootElement);
         this.init();
     }
 
     public destroy() {
-        document.body.removeChild(this.canvasElement);
+        this.rootElement.removeChild(this.canvasElement);
     }
 
     private init() {

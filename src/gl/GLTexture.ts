@@ -1,5 +1,6 @@
 import GLContext from "./GLContext";
 
+
 export default class GLTexture {
 
     /**
@@ -27,7 +28,6 @@ export default class GLTexture {
         this.glTexture = texture;
         this.gl = gl;
 
-        this.active();
         this.bind();
 
         // Fill the texture with a 1x1 pixel
@@ -44,9 +44,7 @@ export default class GLTexture {
     /**
      *
      */
-    public active() {
-        this.gl.activeTexture(this.gl.TEXTURE0);
-    }
+    public active() {}
 
     /**
      *

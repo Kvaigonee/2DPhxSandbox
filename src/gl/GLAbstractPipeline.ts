@@ -43,7 +43,7 @@ export default abstract class GLAbstractPipeline {
     /**
      *
      */
-    public abstract render(time : number) : void;
+    public abstract render() : void;
 
     /**
      *

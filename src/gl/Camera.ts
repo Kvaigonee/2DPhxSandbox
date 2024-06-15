@@ -7,7 +7,7 @@ const DEFAULT_PARAMETERS : ICameraParameters = {
     far : 2000
 }
 
-const DEFAULT_POSITION : [number, number, number] = [0, 0, 2];
+const DEFAULT_POSITION : [number, number, number] = [0, 0, 5];
 const DEFAULT_TARGET : [number, number, number] = [0, 0, 0];
 const DEFAULT_UP : [number, number, number] = [0, 1, 0];
 
@@ -88,7 +88,11 @@ export default class Camera {
     }
 
     public getMatrix() {
-        return [...this.matrix];
+        return this.matrix;
+    }
+
+    public getInvertedMatrix() {
+        return mat4.invert(mat4.create(), this.matrix);
     }
 
     public getProjectionMatrix() : ReadonlyMat4 {
@@ -99,17 +103,20 @@ export default class Camera {
         return [...this.position];
     }
 
+    public rotate(radians: number) {
+        this.matrix = mat4.rotateY(mat4.create(), this.matrix, radians);
+    }
+
+    public translate(translate: ReadonlyVec3) {
+        this.matrix = mat4.translate(mat4.create(), this.matrix, translate);
+    }
+
     public setPosition(position: ReadonlyVec3) {
         this.position = position;
     }
 
     public lookAt(target: ReadonlyVec3, up: ReadonlyVec3) {
         this.matrix = mat4.lookAt(mat4.create(), this.position, target, up);
-    }
-
-    public getViewProjectionMatrix() {
-        const invertedCameraMatrix = mat4.invert(mat4.create(), this.matrix);
-        return mat4.multiply(mat4.create(), this.projectionMatrix, invertedCameraMatrix);
     }
 }
 

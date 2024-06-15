@@ -40,16 +40,16 @@ export class Translation extends AbstractExample {
     private inputX = document.createElement("input");
     private inputY = document.createElement("input");
 
-    public constructor() {
-        super();
+    public constructor(rootElement: HTMLElement) {
+        super(rootElement);
 
         this.init();
     }
 
     public destroy() {
-        document.body.removeChild(this.canvasElement);
-        document.body.removeChild(this.inputX);
-        document.body.removeChild(this.inputY);
+        this.rootElement.removeChild(this.canvasElement);
+        this.rootElement.removeChild(this.inputX);
+        this.rootElement.removeChild(this.inputY);
     }
 
     private init() {
@@ -99,8 +99,8 @@ export class Translation extends AbstractExample {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
         }
 
-        document.body.appendChild(this.inputX);
-        document.body.appendChild(this.inputY);
+        this.rootElement.appendChild(this.inputX);
+        this.rootElement.appendChild(this.inputY);
 
         this.inputX.type = "range";
         this.inputY.type = "range"

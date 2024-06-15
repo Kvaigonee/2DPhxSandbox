@@ -43,15 +43,15 @@ export class RotationTriangle extends AbstractExample {
 
     private inputFov = document.createElement("input");
 
-    public constructor() {
-        super();
+    public constructor(rootElement: HTMLElement) {
+        super(rootElement);
 
         this.init();
     }
 
     public destroy() {
-        document.body.removeChild(this.canvasElement);
-        document.body.removeChild(this.inputFov);
+        this.rootElement.removeChild(this.canvasElement);
+        this.rootElement.removeChild(this.inputFov);
     }
 
     private init() {
@@ -130,7 +130,7 @@ export class RotationTriangle extends AbstractExample {
 
         const degreeToRadians = Math.PI / 180;
 
-        document.body.appendChild(this.inputFov);
+        this.rootElement.appendChild(this.inputFov);
 
         this.inputFov.type = "range";
         this.inputFov.max = "180";

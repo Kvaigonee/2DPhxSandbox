@@ -88,7 +88,12 @@ class GLTexturedObjectPipeline extends GLAbstractPipeline {
     /**
      *
      */
-    public constructor(glContext : GLContext) {
+    public translate : [number, number, number] = [0, 0, 0];
+
+    /**
+     *
+     */
+    public constructor(glContext : GLContext, texture: GLTexture, camera: Camera) {
         super(glContext);
         this.glProgram = this.createProgram();
 
@@ -118,19 +123,18 @@ class GLTexturedObjectPipeline extends GLAbstractPipeline {
         });
 
         this.uvCoordinatesBuffer.setData(this.createUVCoordinates());
-        this.texture = new GLTexture(glContext, "src/assets/images/Earth.jpg");
 
-        this.camera = new Camera();
+        this.texture = texture;
+        this.camera = camera;
     }
 
     /**
      *
      */
-    public render(x = 0, y = 0, z = 0) {
+    public render() {
+        const translate = this.translate;
         const gl = this.glContext.getContext();
         const canvas = gl.canvas as HTMLCanvasElement;
-
-        gl.clearColor(0, 0, 0, 0);
 
         this.rotationY = (this.rotationY + 0.3) % 360;
 
@@ -142,13 +146,16 @@ class GLTexturedObjectPipeline extends GLAbstractPipeline {
         const program = this.glProgram.getProgram();
         gl.useProgram(program);
 
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        this.texture.bind();
 
         let viewProjectionMatrix = this.camera.getProjectionMatrix();
+        viewProjectionMatrix = mat4.multiply(mat4.create(), viewProjectionMatrix, this.camera.getInvertedMatrix());
 
-        viewProjectionMatrix = mat4.translate(mat4.create(), viewProjectionMatrix, [x, y, z - 3]);
+        viewProjectionMatrix = mat4.translate(mat4.create(), viewProjectionMatrix, translate);
         viewProjectionMatrix = mat4.rotateY(mat4.create(), viewProjectionMatrix, Math.PI / 180 * this.rotationY);
         viewProjectionMatrix = mat4.rotateX(mat4.create(), viewProjectionMatrix, Math.PI / 180 * (this.rotationY / 2));
+
+      //  viewProjectionMatrix = mat4.multiply(mat4.create(), viewProjectionMatrix, this.camera.getInvertedMatrix());
 
         const matrixLocation = gl.getUniformLocation(program, "u_matrix");
         gl.uniformMatrix4fv(matrixLocation, false, viewProjectionMatrix);
@@ -254,28 +261,39 @@ class GLTexturedObjectPipeline extends GLAbstractPipeline {
     }
 }
 
-function degToRad(d : number) {
-    return d * Math.PI / 180;
-}
-
 
 export default class CubeExample extends AbstractExample {
 
-    public constructor() {
-        super();
+    public constructor(rootElement: HTMLElement) {
+        super(rootElement);
         this.init();
     }
 
     public destroy() {
-        document.body.removeChild(this.canvasElement);
+        this.rootElement.removeChild(this.canvasElement);
     }
 
     private init() {
         const glContext = new GLContext(this.canvasElement);
-        const pipeline = new GLTexturedObjectPipeline(glContext);
+
+        const camera = new Camera();
+        console.warn(camera);
+
+        camera.translate([0, 0, 5]);
+
+        const pipeline = new GLTexturedObjectPipeline(glContext, new GLTexture(glContext,"src/assets/images/Earth.jpg"), camera);
+        pipeline.translate = [0, -1, -10];
+
+        const pipeline2 = new GLTexturedObjectPipeline(glContext, new GLTexture(glContext), camera);
+        pipeline2.translate = [-2, -1, -6];
+
+        const pipeline3 = new GLTexturedObjectPipeline(glContext, new GLTexture(glContext), camera);
+        pipeline3.translate = [-1, -1, -8];
 
         setInterval(() => {
             pipeline.render();
+            pipeline2.render();
+            pipeline3.render();
         }, 1000 / 60);
     }
 }
